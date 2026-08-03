@@ -27,11 +27,13 @@
 //size in words
 #define CODE_RAM_SIZE     (1<<LOG_CODE_RAM_SIZE)
 
-// GIC device ID and the IP's fabric interrupt ID: both are only defined
+// GIC base address and the IP's fabric interrupt ID: both are only defined
 // in xparameters.h once the interrupt port is wired to IRQ_F2P in Vivado
 // and the platform is rebuilt from the new .xsa.
-#define INTC_DEVICE_ID       XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define IP_INTR_ID           XPAR_FABRIC_FETCHING_DECODING_IP_0_INTERRUPT_INTR
+#define INTC_BASEADDR        XPAR_XSCUGIC_0_BASEADDR
+// xparameters.h gives the raw SPI index; the GIC API needs the SPI's
+// full interrupt ID, which is offset by 32 (IDs 0-31 are SGIs/PPIs).
+#define IP_INTR_ID           (XPAR_FABRIC_FETCHING_DECODING_IP_0_INTR + 32)
 
 XFetching_decoding_ip_Config *cfg_ptr;
 XFetching_decoding_ip         ip;
@@ -50,7 +52,7 @@ void ip_interrupt_handler(void *CallbackRef){
 }
 
 int setup_interrupt_system(){
-  XScuGic_Config *intc_cfg = XScuGic_LookupConfig(INTC_DEVICE_ID);
+  XScuGic_Config *intc_cfg = XScuGic_LookupConfig(INTC_BASEADDR);
   if (XScuGic_CfgInitialize(&intc, intc_cfg, intc_cfg->CpuBaseAddress) != XST_SUCCESS)
     return XST_FAILURE;
 
