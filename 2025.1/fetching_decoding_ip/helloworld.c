@@ -44,7 +44,7 @@ word_type code_ram[CODE_RAM_SIZE]={
 #include "test_op_imm_0_text.hex"
 };
 
-void ip_interrupt_handler(void *CallbackRef){
+void ip_interrupt_handler(void *){
   XFetching_decoding_ip_InterruptGlobalDisable(&ip);
   XFetching_decoding_ip_InterruptClear(&ip, 1);
   ip_done = 1;
